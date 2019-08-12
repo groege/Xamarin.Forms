@@ -16,6 +16,7 @@ using System;
 using System.ComponentModel;
 using System.Reflection;
 using Android.Content;
+using Android.Graphics;
 using Android.Runtime;
 using Android.Support.V4.Widget;
 using Android.Views;
@@ -142,11 +143,11 @@ namespace Xamarin.Forms.Platform.Android
                 return;
             if (RefreshView.RefreshColor != Color.Default)
                 SetColorSchemeColors(RefreshView.RefreshColor.ToAndroid());
-            if (RefreshView.RefreshBackgroundColor != Color.Default)
-                SetProgressBackgroundColorSchemeColor(RefreshView.RefreshBackgroundColor.ToAndroid());
+			if (RefreshView.BackgroundColor != Color.Default)
+				SetProgressBackgroundColorSchemeColor(RefreshView.BackgroundColor.ToAndroid());
         }
 
-        bool refreshing;
+		bool refreshing;
         /// <summary>
         /// Gets or sets a value indicating whether this
         /// <see cref="Refractored.XamForms.PullToRefresh.Droid.RefreshViewRenderer"/> is refreshing.
@@ -184,7 +185,7 @@ namespace Xamarin.Forms.Platform.Android
         
 
         void UpdateIsSwipeToRefreshEnabled() =>
-            Enabled = RefreshView.IsPullToRefreshEnabled;
+            Enabled = RefreshView.IsEnabled;
         
 
 
@@ -270,9 +271,9 @@ namespace Xamarin.Forms.Platform.Android
         /// </summary>
         public void OnRefresh()
         {
-            if (RefreshView?.RefreshCommand?.CanExecute(RefreshView?.RefreshCommandParameter) ?? false)
+            if (RefreshView?.Command?.CanExecute(RefreshView?.CommandParameter) ?? false)
             {
-                RefreshView.RefreshCommand.Execute(RefreshView?.RefreshCommandParameter);
+                RefreshView.Command.Execute(RefreshView?.CommandParameter);
             }
         }
 
@@ -287,13 +288,11 @@ namespace Xamarin.Forms.Platform.Android
         {
             if (e.PropertyName == "Content")
                 UpdateContent();
-            else if (e.PropertyName == RefreshView.IsPullToRefreshEnabledProperty.PropertyName)
+            else if (e.PropertyName == RefreshView.IsEnabledProperty.PropertyName)
                 UpdateIsSwipeToRefreshEnabled();
             else if (e.PropertyName == RefreshView.IsRefreshingProperty.PropertyName)
                 UpdateIsRefreshing();
-            else if (e.PropertyName == RefreshView.RefreshColorProperty.PropertyName)
-                UpdateColors();
-            else if (e.PropertyName == RefreshView.RefreshBackgroundColorProperty.PropertyName)
+            else if (e.IsOneOf(RefreshView.RefreshColorProperty, RefreshView.BackgroundColorProperty))
                 UpdateColors();
 
 			ElementPropertyChanged?.Invoke(sender, e);

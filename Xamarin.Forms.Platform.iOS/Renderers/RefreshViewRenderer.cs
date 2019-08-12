@@ -33,12 +33,11 @@ namespace Xamarin.Forms.Platform.iOS
         UIRefreshControl refreshControl;
         UIView refreshControlParent;
 
-
-        /// <summary>
-        /// Raises the element changed event.
-        /// </summary>
-        /// <param name="e">E.</param>
-        protected override void OnElementChanged(ElementChangedEventArgs<RefreshView> e)
+		/// <summary>
+		/// Raises the element changed event.
+		/// </summary>
+		/// <param name="e">E.</param>
+		protected override void OnElementChanged(ElementChangedEventArgs<RefreshView> e)
         {
             base.OnElementChanged(e);
 
@@ -219,23 +218,35 @@ namespace Xamarin.Forms.Platform.iOS
 
         void UpdateColors()
         {
-            if (RefreshView == null)
+            if (RefreshView == null || refreshControl == null)
                 return;
+
             if (RefreshView.RefreshColor != Color.Default)
                 refreshControl.TintColor = RefreshView.RefreshColor.ToUIColor();
-            if (RefreshView.RefreshBackgroundColor != Color.Default)
-                refreshControl.BackgroundColor = RefreshView.RefreshBackgroundColor.ToUIColor();
+
+			SetBackgroundColor(RefreshView.BackgroundColor);
         }
 
+		protected override void SetBackgroundColor(Color color)
+		{
+			if (refreshControl == null)
+				return;
 
-        void UpdateIsRefreshing()
+			if (color != Color.Default)
+				refreshControl.BackgroundColor = color.ToUIColor();
+			else
+				refreshControl.BackgroundColor = null;
+		}
+
+
+		void UpdateIsRefreshing()
         {
             IsRefreshing = RefreshView.IsRefreshing;
         }
 
         void UpdateIsSwipeToRefreshEnabled()
         {
-            if (RefreshView.IsPullToRefreshEnabled)
+            if (RefreshView.IsEnabled)
             {
                 this.TryInsertRefresh(this.refreshControlParent);
             }
@@ -289,9 +300,9 @@ namespace Xamarin.Forms.Platform.iOS
         /// </summary>
         void OnRefresh(object sender, EventArgs e)
         {
-            if (RefreshView?.RefreshCommand?.CanExecute(RefreshView?.RefreshCommandParameter) ?? false)
+            if (RefreshView?.Command?.CanExecute(RefreshView?.CommandParameter) ?? false)
             {
-                RefreshView.RefreshCommand.Execute(RefreshView?.RefreshCommandParameter);
+                RefreshView.Command.Execute(RefreshView?.CommandParameter);
             }
         }
 
@@ -303,13 +314,11 @@ namespace Xamarin.Forms.Platform.iOS
         protected override void OnElementPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             base.OnElementPropertyChanged(sender, e);
-            if (e.PropertyName == RefreshView.IsPullToRefreshEnabledProperty.PropertyName)
+            if (e.PropertyName == RefreshView.IsEnabledProperty.PropertyName)
                 UpdateIsSwipeToRefreshEnabled();
             else if (e.PropertyName == RefreshView.IsRefreshingProperty.PropertyName)
                 UpdateIsRefreshing();
-            else if (e.PropertyName == RefreshView.RefreshColorProperty.PropertyName)
-                UpdateColors();
-            else if (e.PropertyName == RefreshView.RefreshBackgroundColorProperty.PropertyName)
+            else if (e.IsOneOf(RefreshView.RefreshColorProperty, RefreshView.BackgroundColorProperty))
                 UpdateColors();
         }
 

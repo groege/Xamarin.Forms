@@ -56,43 +56,26 @@ namespace Xamarin.Forms
         }
 
         /// <summary>
-        /// The is pull to refresh enabled property.
-        /// </summary>
-        public static readonly BindableProperty IsPullToRefreshEnabledProperty =
-            BindableProperty.Create(nameof(IsPullToRefreshEnabled), typeof(bool), typeof(RefreshView), true);
-
-        /// <summary>
-        /// Gets or sets a value indicating whether this instance is pull to refresh enabled.
-        /// </summary>
-        /// <value><c>true</c> if this instance is pull to refresh enabled; otherwise, <c>false</c>.</value>
-        public bool IsPullToRefreshEnabled
-        {
-            get { return (bool)GetValue(IsPullToRefreshEnabledProperty); }
-            set { SetValue(IsPullToRefreshEnabledProperty, value); }
-        }
-
-
-        /// <summary>
         /// The refresh command property.
         /// </summary>
-        public static readonly BindableProperty RefreshCommandProperty =
-            BindableProperty.Create(nameof(RefreshCommand), typeof(ICommand), typeof(RefreshView));
+        public static readonly BindableProperty CommandProperty =
+            BindableProperty.Create(nameof(Command), typeof(ICommand), typeof(RefreshView));
 
         /// <summary>
         /// Gets or sets the refresh command.
         /// </summary>
         /// <value>The refresh command.</value>
-        public ICommand RefreshCommand
+        public ICommand Command
         {
-            get { return (ICommand)GetValue(RefreshCommandProperty); }
-            set { SetValue(RefreshCommandProperty, value); }
+            get { return (ICommand)GetValue(CommandProperty); }
+            set { SetValue(CommandProperty, value); }
         }
 
         /// <summary>
         /// Gets the Refresh command 
         /// </summary>
-        public static readonly BindableProperty RefreshCommandParameterProperty =
-            BindableProperty.Create(nameof(RefreshCommandParameter),
+        public static readonly BindableProperty CommandParameterProperty =
+            BindableProperty.Create(nameof(CommandParameter),
                 typeof(object),
                 typeof(RefreshView),
                 null,
@@ -101,10 +84,10 @@ namespace Xamarin.Forms
         /// <summary>
         /// Gets or sets the Refresh command parameter
         /// </summary>
-        public object RefreshCommandParameter
+        public object CommandParameter
         {
-            get { return GetValue(RefreshCommandParameterProperty); }
-            set { SetValue(RefreshCommandParameterProperty, value); }
+            get { return GetValue(CommandParameterProperty); }
+            set { SetValue(CommandParameterProperty, value); }
         }
 
         /// <summary>
@@ -114,9 +97,9 @@ namespace Xamarin.Forms
         /// <param name="eventArgs"></param>
         void RefreshCommandCanExecuteChanged(object sender, EventArgs eventArgs)
         {
-            ICommand cmd = RefreshCommand;
+            ICommand cmd = Command;
             if (cmd != null)
-                IsEnabled = cmd.CanExecute(RefreshCommandParameter);
+                base.IsEnabled = cmd.CanExecute(CommandParameter);
         }
 
         /// <summary>
@@ -132,23 +115,6 @@ namespace Xamarin.Forms
         {
             get { return (Color)GetValue(RefreshColorProperty); }
             set { SetValue(RefreshColorProperty, value); }
-        }
-
-
-
-        /// <summary>
-        /// Color property of refresh background color
-        /// </summary>
-        public static readonly BindableProperty RefreshBackgroundColorProperty =
-            BindableProperty.Create(nameof(RefreshBackgroundColor), typeof(Color), typeof(RefreshView), Color.Default);
-
-        /// <summary>
-        /// Refresh background color
-        /// </summary>
-        public Color RefreshBackgroundColor
-        {
-            get { return (Color)GetValue(RefreshBackgroundColorProperty); }
-            set { SetValue(RefreshBackgroundColorProperty, value); }
         }
 
 
