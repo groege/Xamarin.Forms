@@ -16,7 +16,6 @@ namespace Xamarin.Forms.Platform.Android
 
 			switch (itemsSource)
 			{
-				// TODO hartez ObservableItemSource should be taking an INotifyCollectionChanged in its constructor
 				case IList _ when itemsSource is INotifyCollectionChanged:
 					return new ObservableItemsSource(itemsSource as IList, adapter);
 				case IEnumerable<object> generic:
@@ -24,6 +23,16 @@ namespace Xamarin.Forms.Platform.Android
 			}
 
 			return new ListSource(itemsSource);
+		}
+
+		public static IItemsViewSource CreateGrouped(IEnumerable itemsSource, RecyclerView.Adapter adapter)
+		{
+			if (itemsSource == null)
+			{
+				return new EmptySource();
+			}
+
+			return new ObservableGroupedSource(itemsSource, adapter);
 		}
 	}
 }

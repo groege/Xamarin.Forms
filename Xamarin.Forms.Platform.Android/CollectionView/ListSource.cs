@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace Xamarin.Forms.Platform.Android
 {
-	sealed class ListSource : IItemsViewSource
+	sealed class ListSource : IItemsViewSource, IList
 	{
-		private List<object> _itemsSource;
+		private IList _internal;
 
 		public ListSource()
 		{
@@ -29,6 +29,16 @@ namespace Xamarin.Forms.Platform.Android
 
 		public bool HasHeader { get; set; }
 		public bool HasFooter { get; set; }
+
+		public bool IsReadOnly => _internal.IsReadOnly;
+
+		public bool IsFixedSize => _internal.IsFixedSize;
+
+		public object SyncRoot => _internal.SyncRoot;
+
+		public bool IsSynchronized => _internal.IsSynchronized;
+
+		object IList.this[int index] { get => _internal[index]; set => _internal[index] = value; }
 
 		public void Dispose()
 		{
@@ -81,6 +91,50 @@ namespace Xamarin.Forms.Platform.Android
 		int AdjustPosition(int index)
 		{
 			return index + (HasHeader ? 1 : 0);
+		}
+		public int Add(object value)
+		{
+			return _internal.Add(value);
+		}
+
+		public bool Contains(object value)
+		{
+			return _internal.Contains(value);
+		}
+
+		public void Clear()
+		{
+			_internal.Clear();
+		}
+
+		public int IndexOf(object value)
+		{
+			return _internal.IndexOf(value);
+		}
+
+		public void Insert(int index, object value)
+		{
+			_internal.Insert(index, value);
+		}
+
+		public void Remove(object value)
+		{
+			_internal.Remove(value);
+		}
+
+		public void RemoveAt(int index)
+		{
+			_internal.RemoveAt(index);
+		}
+
+		public void CopyTo(Array array, int index)
+		{
+			_internal.CopyTo(array, index);
+		}
+
+		public IEnumerator GetEnumerator()
+		{
+			return _internal.GetEnumerator();
 		}
 	}
 }

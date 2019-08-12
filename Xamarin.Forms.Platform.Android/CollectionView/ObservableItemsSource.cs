@@ -8,14 +8,15 @@ namespace Xamarin.Forms.Platform.Android
 	internal class ObservableItemsSource : IItemsViewSource
 	{
 		readonly RecyclerView.Adapter _adapter;
+		readonly int _group;
 		readonly IList _itemsSource;
 		bool _disposed;
 
-		public ObservableItemsSource(IList itemSource, RecyclerView.Adapter adapter)
+		public ObservableItemsSource(IList itemSource, RecyclerView.Adapter adapter, int group = -1)
 		{
 			_itemsSource = itemSource;
 			_adapter = adapter;
-
+			_group = group;
 			((INotifyCollectionChanged)itemSource).CollectionChanged += CollectionChanged;
 		}
 
@@ -69,14 +70,16 @@ namespace Xamarin.Forms.Platform.Android
 
 		protected virtual void Dispose(bool disposing)
 		{
-			if (!_disposed)
+			if (_disposed)
 			{
-				if (disposing)
-				{
-					((INotifyCollectionChanged)_itemsSource).CollectionChanged -= CollectionChanged;
-				}
+				return;
+			}
 
-				_disposed = true;
+			_disposed = true;
+
+			if (disposing)
+			{
+				((INotifyCollectionChanged)_itemsSource).CollectionChanged -= CollectionChanged;
 			}
 		}
 

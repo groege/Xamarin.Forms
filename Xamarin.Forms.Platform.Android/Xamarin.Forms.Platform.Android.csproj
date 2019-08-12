@@ -71,6 +71,7 @@
     <Compile Include="CollectionView\CenterSnapHelper.cs" />
     <Compile Include="CollectionView\DataChangeObserver.cs" />
     <Compile Include="CollectionView\EmptySource.cs" />
+    <Compile Include="CollectionView\ObservableGroupedSource.cs" />
     <Compile Include="CollectionView\RecyclerViewScrollListener.cs" />
     <Compile Include="CollectionView\GridLayoutSpanSizeLookup.cs" />
     <Compile Include="CollectionView\NongreedySnapHelper.cs" />
