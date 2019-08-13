@@ -359,7 +359,7 @@ namespace Xamarin.Forms.Platform.iOS
 			Control.TableHeaderView = _headerRenderer.NativeView;
 		}
 
-		async void OnScrollToRequested(object sender, ScrollToRequestedEventArgs e)
+		void OnScrollToRequested(object sender, ScrollToRequestedEventArgs e)
 		{
 			if (Superview == null)
 			{
@@ -386,9 +386,12 @@ namespace Xamarin.Forms.Platform.iOS
 					//iOS11 hack
 					if (Forms.IsiOS11OrNewer)
 					{
-						await Task.Delay(1);
+						Device.BeginInvokeOnMainThread(() =>
+						{
+							if(Control != null && !_disposed)
+								Control.ScrollToRow(NSIndexPath.FromRowSection(index, 0), position, e.ShouldAnimate);
+						});
 					}
-					Control.ScrollToRow(NSIndexPath.FromRowSection(index, 0), position, e.ShouldAnimate);
 				}
 			}
 		}
