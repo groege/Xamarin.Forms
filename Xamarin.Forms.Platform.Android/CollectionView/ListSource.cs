@@ -6,7 +6,7 @@ namespace Xamarin.Forms.Platform.Android
 {
 	sealed class ListSource : IItemsViewSource, IList
 	{
-		private IList _internal;
+		private IList _itemsSource;
 
 		public ListSource()
 		{
@@ -30,15 +30,15 @@ namespace Xamarin.Forms.Platform.Android
 		public bool HasHeader { get; set; }
 		public bool HasFooter { get; set; }
 
-		public bool IsReadOnly => _internal.IsReadOnly;
+		public bool IsReadOnly => _itemsSource.IsReadOnly;
 
-		public bool IsFixedSize => _internal.IsFixedSize;
+		public bool IsFixedSize => _itemsSource.IsFixedSize;
 
-		public object SyncRoot => _internal.SyncRoot;
+		public object SyncRoot => _itemsSource.SyncRoot;
 
-		public bool IsSynchronized => _internal.IsSynchronized;
+		public bool IsSynchronized => _itemsSource.IsSynchronized;
 
-		object IList.this[int index] { get => _internal[index]; set => _internal[index] = value; }
+		object IList.this[int index] { get => _itemsSource[index]; set => _itemsSource[index] = value; }
 
 		public void Dispose()
 		{
@@ -94,47 +94,47 @@ namespace Xamarin.Forms.Platform.Android
 		}
 		public int Add(object value)
 		{
-			return _internal.Add(value);
+			return _itemsSource.Add(value);
 		}
 
 		public bool Contains(object value)
 		{
-			return _internal.Contains(value);
+			return _itemsSource.Contains(value);
 		}
 
 		public void Clear()
 		{
-			_internal.Clear();
+			_itemsSource.Clear();
 		}
 
 		public int IndexOf(object value)
 		{
-			return _internal.IndexOf(value);
+			return _itemsSource.IndexOf(value);
 		}
 
 		public void Insert(int index, object value)
 		{
-			_internal.Insert(index, value);
+			_itemsSource.Insert(index, value);
 		}
 
 		public void Remove(object value)
 		{
-			_internal.Remove(value);
+			_itemsSource.Remove(value);
 		}
 
 		public void RemoveAt(int index)
 		{
-			_internal.RemoveAt(index);
+			_itemsSource.RemoveAt(index);
 		}
 
 		public void CopyTo(Array array, int index)
 		{
-			_internal.CopyTo(array, index);
+			_itemsSource.CopyTo(array, index);
 		}
 
 		public IEnumerator GetEnumerator()
 		{
-			return _internal.GetEnumerator();
+			return _itemsSource.GetEnumerator();
 		}
 	}
 }

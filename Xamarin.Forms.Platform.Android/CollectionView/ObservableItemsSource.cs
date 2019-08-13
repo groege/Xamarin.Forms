@@ -8,15 +8,13 @@ namespace Xamarin.Forms.Platform.Android
 	internal class ObservableItemsSource : IItemsViewSource
 	{
 		readonly RecyclerView.Adapter _adapter;
-		readonly int _group;
 		readonly IList _itemsSource;
 		bool _disposed;
 
-		public ObservableItemsSource(IList itemSource, RecyclerView.Adapter adapter, int group = -1)
+		public ObservableItemsSource(IList itemSource, RecyclerView.Adapter adapter)
 		{
 			_itemsSource = itemSource;
 			_adapter = adapter;
-			_group = group;
 			((INotifyCollectionChanged)itemSource).CollectionChanged += CollectionChanged;
 		}
 
@@ -56,11 +54,11 @@ namespace Xamarin.Forms.Platform.Android
 			{
 				if (_itemsSource[n] == item)
 				{
-					return AdjustNotifyIndex(n);
+					return AdjustPositionIndex(n);
 				}
 			}
 
-			throw new IndexOutOfRangeException($"{item} not found in source.");
+			return -1;
 		}
 
 		public object GetItem(int position)
@@ -88,7 +86,7 @@ namespace Xamarin.Forms.Platform.Android
 			return index - (HasHeader ? 1 : 0);
 		}
 
-		int AdjustNotifyIndex(int index)
+		int AdjustPositionIndex(int index)
 		{
 			return index + (HasHeader ? 1 : 0);
 		}
@@ -124,19 +122,19 @@ namespace Xamarin.Forms.Platform.Android
 			if (count == 1)
 			{
 				// For a single item, we can use NotifyItemMoved and get the animation
-				_adapter.NotifyItemMoved(AdjustNotifyIndex(args.OldStartingIndex), AdjustNotifyIndex(args.NewStartingIndex));
+				_adapter.NotifyItemMoved(AdjustPositionIndex(args.OldStartingIndex), AdjustPositionIndex(args.NewStartingIndex));
 				return;
 			}
 
-			var start = AdjustNotifyIndex(Math.Min(args.OldStartingIndex, args.NewStartingIndex));
-			var end = AdjustNotifyIndex(Math.Max(args.OldStartingIndex, args.NewStartingIndex) + count);
+			var start = AdjustPositionIndex(Math.Min(args.OldStartingIndex, args.NewStartingIndex));
+			var end = AdjustPositionIndex(Math.Max(args.OldStartingIndex, args.NewStartingIndex) + count);
 			_adapter.NotifyItemRangeChanged(start, end);
 		}
 
 		void Add(NotifyCollectionChangedEventArgs args)
 		{
 			var startIndex = args.NewStartingIndex > -1 ? args.NewStartingIndex : _itemsSource.IndexOf(args.NewItems[0]);
-			startIndex = AdjustNotifyIndex(startIndex);
+			startIndex = AdjustPositionIndex(startIndex);
 			var count = args.NewItems.Count;
 
 			if (count == 1)
@@ -160,7 +158,7 @@ namespace Xamarin.Forms.Platform.Android
 				return;
 			}
 
-			startIndex = AdjustNotifyIndex(startIndex);
+			startIndex = AdjustPositionIndex(startIndex);
 
 			// If we have a start index, we can be more clever about removing the item(s) (and get the nifty animations)
 			var count = args.OldItems.Count;
@@ -177,7 +175,7 @@ namespace Xamarin.Forms.Platform.Android
 		void Replace(NotifyCollectionChangedEventArgs args)
 		{
 			var startIndex = args.NewStartingIndex > -1 ? args.NewStartingIndex : _itemsSource.IndexOf(args.NewItems[0]);
-			startIndex = AdjustNotifyIndex(startIndex);
+			startIndex = AdjustPositionIndex(startIndex);
 			var newCount = args.NewItems.Count;
 
 			if (newCount == args.OldItems.Count)
@@ -200,7 +198,5 @@ namespace Xamarin.Forms.Platform.Android
 			// have to be updated. So we just have to use NotifyDataSetChanged and let the RecyclerView update everything
 			_adapter.NotifyDataSetChanged();
 		}
-
-		
 	}
 }
