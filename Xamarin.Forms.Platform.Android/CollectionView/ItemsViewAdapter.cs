@@ -29,7 +29,7 @@ namespace Xamarin.Forms.Platform.Android
 			ItemsView.PropertyChanged += ItemsViewPropertyChanged;
 
 			_createItemContentView = createItemContentView;
-			ItemsSource = ItemsSourceFactory.Create(itemsView.ItemsSource, this);
+			ItemsSource = ItemsSourceFactory.Create(ItemsView, this);
 
 			UpdateHasHeader();
 			UpdateHasFooter();
@@ -101,23 +101,6 @@ namespace Xamarin.Forms.Platform.Android
 			}
 		}
 
-		void BindTemplatedItemViewHolder(TemplatedItemViewHolder templatedItemViewHolder, object context)
-		{
-			if (ItemsView.ItemSizingStrategy == ItemSizingStrategy.MeasureFirstItem)
-			{
-				templatedItemViewHolder.Bind(context, ItemsView, SetStaticSize, _size);
-			}
-			else
-			{
-				templatedItemViewHolder.Bind(context, ItemsView);
-			}
-		}
-
-		void SetStaticSize(Size size)
-		{
-			_size = size;
-		}
-
 		public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
 		{
 			var context = parent.Context;
@@ -184,6 +167,23 @@ namespace Xamarin.Forms.Platform.Android
 		public virtual int GetPositionForItem(object item)
 		{
 			return ItemsSource.GetPosition(item);
+		}
+
+		void BindTemplatedItemViewHolder(TemplatedItemViewHolder templatedItemViewHolder, object context)
+		{
+			if (ItemsView.ItemSizingStrategy == ItemSizingStrategy.MeasureFirstItem)
+			{
+				templatedItemViewHolder.Bind(context, ItemsView, SetStaticSize, _size);
+			}
+			else
+			{
+				templatedItemViewHolder.Bind(context, ItemsView);
+			}
+		}
+
+		void SetStaticSize(Size size)
+		{
+			_size = size;
 		}
 
 		void UpdateUsingItemTemplate()

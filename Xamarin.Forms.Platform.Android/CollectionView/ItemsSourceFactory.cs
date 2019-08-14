@@ -25,14 +25,21 @@ namespace Xamarin.Forms.Platform.Android
 			return new ListSource(itemsSource);
 		}
 
-		public static IItemsViewSource CreateGrouped(IEnumerable itemsSource, RecyclerView.Adapter adapter)
+		public static IItemsViewSource Create(ItemsView itemsView, RecyclerView.Adapter adapter)
 		{
-			if (itemsSource == null)
+			var source = itemsView.ItemsSource;
+
+			if (source == null)
 			{
 				return new EmptySource();
 			}
 
-			return new ObservableGroupedSource(itemsSource, adapter);
+			if(itemsView is GroupableItemsView groupableItemsView && groupableItemsView.IsGrouped)
+			{
+				return new ObservableGroupedSource(source, adapter);
+			}
+
+			return Create(source, adapter);
 		}
 	}
 }

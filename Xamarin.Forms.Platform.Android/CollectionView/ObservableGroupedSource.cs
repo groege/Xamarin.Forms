@@ -176,19 +176,19 @@ namespace Xamarin.Forms.Platform.Android
 			switch (args.Action)
 			{
 				case NotifyCollectionChangedAction.Add:
-										Add(args);
+					Add(args);
 					break;
 				case NotifyCollectionChangedAction.Remove:
-										Remove(args);
+					Remove(args);
 					break;
 				case NotifyCollectionChangedAction.Replace:
-					//					Replace(args);
+					Replace(args);
 					break;
 				case NotifyCollectionChangedAction.Move:
-					//					Move(args);
+					Move(args);
 					break;
 				case NotifyCollectionChangedAction.Reset:
-					//					Reload();
+					Reload();
 					break;
 				default:
 					throw new ArgumentOutOfRangeException();
@@ -252,6 +252,52 @@ namespace Xamarin.Forms.Platform.Android
 			// They need to account for all the new items being added
 			// So we need to look at the group at the index, and use its Count 
 			_adapter.NotifyItemRangeRemoved(startIndex, count);
+		}
+
+		void Replace(NotifyCollectionChangedEventArgs args)
+		{
+			var newCount = args.NewItems.Count;
+
+			if (newCount == args.OldItems.Count)
+			{
+				ResetGroupTracking();
+
+				var startIndex = args.NewStartingIndex > -1 ? args.NewStartingIndex : _groupSource.IndexOf(args.NewItems[0]);
+
+				// TODO ???????? ezhart These inserted indexes and ranges aren't quite right
+				// They need to account for all of the items (and headers and footers) in the sections
+				// So we need to look at the group at the index, and use its Count 
+
+				// We are replacing one set of items with a set of equal size; we can do a simple item or range 
+				// notification to the adapter
+				if (newCount == 1)
+				{
+					_adapter.NotifyItemChanged(startIndex);
+				}
+				else
+				{
+					_adapter.NotifyItemRangeChanged(startIndex, newCount);
+				}
+				return;
+			}
+
+			// The original and replacement sets are of unequal size; this means that everything currently in view will 
+			// have to be updated. So we just have to use ReloadData and let the UICollectionView update everything
+			_adapter.NotifyDataSetChanged();
+		}
+
+		void Move(NotifyCollectionChangedEventArgs args)
+		{
+			var count = args.NewItems.Count;
+
+			ResetGroupTracking();
+
+			var start = Math.Min(args.OldStartingIndex, args.NewStartingIndex);
+			var end = Math.Max(args.OldStartingIndex, args.NewStartingIndex) + count;
+
+			// TODO Item range notification should work, but we need to account for all the items inside the groups
+
+			_adapter.NotifyItemRangeChanged(start, end);
 		}
 	}
 }
