@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="Xamarin.Forms.Controls.GalleryPages.RefreshViewGalleries.RefreshCarouselViewGallery"
+    Title="CarouselView (Pull To Refresh)">
+    <ContentPage.Content>
+        <RefreshView
+            IsRefreshing="{Binding IsRefreshing}"
+            RefreshColor="Orange"
+            Command="{Binding RefreshCommand}"
+            HorizontalOptions="FillAndExpand"
+            VerticalOptions="FillAndExpand">
+            <CarouselView
+                ItemsSource="{Binding Items}">
+                <CarouselView.ItemsLayout>
+                    <ListItemsLayout
+                        Orientation="Horizontal"
+                        SnapPointsType="MandatorySingle"
+                        SnapPointsAlignment="Center"/>
+                </CarouselView.ItemsLayout>
+                <CarouselView.ItemTemplate>
+                     <DataTemplate>
+                        <Grid
+                            WidthRequest="400">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <BoxView
+                                Grid.Row="0"
+                                Color="{Binding Color}"/>
+                            <Label
+                                Grid.Row="1"
+                                Text="{Binding Name}"
+                                HorizontalOptions="Center"
+                                FontSize="12"
+                                Margin="0, 12"/>
+                        </Grid>
+                    </DataTemplate>
+                </CarouselView.ItemTemplate>
+            </CarouselView>
+        </RefreshView>
+    </ContentPage.Content>
+</ContentPage>
