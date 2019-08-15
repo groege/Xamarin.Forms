@@ -125,6 +125,11 @@ namespace Xamarin.Forms.Platform.Android
 			UpdateFormsSelection(adapterPosition);
 		}
 
+
+		// TODO !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// Make it so the headers/footers aren't selectable
+
+
 		void UpdateFormsSelection(int adapterPosition)
 		{
 			var mode = ItemsView.SelectionMode;
