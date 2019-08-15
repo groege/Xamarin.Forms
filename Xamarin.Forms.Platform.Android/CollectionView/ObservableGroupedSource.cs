@@ -15,16 +15,21 @@ using Android.Widget;
 
 namespace Xamarin.Forms.Platform.Android
 {
-	internal class ObservableGroupedSource : IItemsViewSource
+	internal class ObservableGroupedSource : IGroupedItemsViewSource
 	{
 		readonly IList _groupSource;
 		readonly RecyclerView.Adapter _adapter;
 		List<IItemsViewSource> _groups = new List<IItemsViewSource>();
 
-		private bool _disposed;
+		bool _hasGroupHeaders;
+		bool _hasGroupFooters;
 
-		public ObservableGroupedSource(IEnumerable groupSource, RecyclerView.Adapter adapter)
+		bool _disposed;
+
+		public ObservableGroupedSource(GroupableItemsView groupableItemsView, RecyclerView.Adapter adapter)
 		{
+			var groupSource = groupableItemsView.ItemsSource;
+
 			_adapter = adapter;
 			_groupSource = groupSource as IList ?? new ListSource(groupSource);
 
@@ -32,6 +37,9 @@ namespace Xamarin.Forms.Platform.Android
 			{
 				incc.CollectionChanged += CollectionChanged;
 			}
+
+			_hasGroupFooters = groupableItemsView.GroupFooterTemplate != null;
+			_hasGroupHeaders = groupableItemsView.GroupHeaderTemplate != null;
 
 			ResetGroupTracking();
 		}
@@ -47,8 +55,7 @@ namespace Xamarin.Forms.Platform.Android
 					groupContents += _groups[n].Count;
 				}
 
-				return _groupSource.Count
-					 + (HasHeader ? 1 : 0)
+				return (HasHeader ? 1 : 0)
 					 + (HasFooter ? 1 : 0)
 					 + groupContents;
 			}
@@ -62,7 +69,7 @@ namespace Xamarin.Forms.Platform.Android
 			Dispose(true);
 		}
 
-		public bool IsFooter(int index)
+		public bool IsFooter(int position)
 		{
 			if (!HasFooter)
 			{
@@ -71,15 +78,62 @@ namespace Xamarin.Forms.Platform.Android
 
 			if (HasHeader)
 			{
-				return index == _groupSource.Count + 1;
+				return position == _groupSource.Count + 1;
 			}
 
-			return index == _groupSource.Count;
+			return position == _groupSource.Count;
 		}
 
-		public bool IsHeader(int index)
+		public bool IsHeader(int position)
 		{
-			return HasHeader && index == 0;
+			return HasHeader && position == 0;
+		}
+
+		public bool IsGroupHeader(int position)
+		{
+			if (IsFooter(position) || IsHeader(position))
+			{
+				return false;
+			}
+
+			var (group, inGroup) = GetGroupIndex(position);
+
+			return _groups[group].IsHeader(inGroup);
+		}
+
+		(int, int) GetGroupIndex(int position)
+		{
+			position = AdjustIndexRequest(position);
+
+			var group = 0;
+			var inGroup = 0;
+
+			while (position > 0)
+			{
+				inGroup += 1;
+
+				if (inGroup == _groups[group].Count)
+				{
+					group += 1;
+					inGroup = 0;
+				}
+
+				position -= 1;
+			}
+
+			return (group, inGroup);
+		}
+
+		public bool IsGroupFooter(int position)
+		{
+			if (IsFooter(position) || IsHeader(position))
+			{
+				return false;
+			}
+
+			var (group, inGroup) = GetGroupIndex(position);
+
+			return _groups[group].IsFooter(inGroup);
 		}
 
 		public int GetPosition(object item)
@@ -104,22 +158,12 @@ namespace Xamarin.Forms.Platform.Android
 
 		public object GetItem(int position)
 		{
-			position = AdjustIndexRequest(position);
+			var (group, inGroup) = GetGroupIndex(position);
 
-			var group = 0;
-			var inGroup = 0;
-
-			while (position > 0)
+			if (IsGroupFooter(position) || IsGroupHeader(position))
 			{
-				inGroup += 1;
-
-				if (inGroup == _groups[group].Count)
-				{
-					group += 1;
-					inGroup = 0;
-				}
-
-				position -= 1;
+				// This is looping to find the group/index twice, need to make it less inefficient
+				return _groupSource[group];
 			}
 
 			return _groups[group].GetItem(inGroup);
@@ -138,7 +182,10 @@ namespace Xamarin.Forms.Platform.Android
 			{
 				ClearGroupTracking();
 
-				((INotifyCollectionChanged)_groupSource).CollectionChanged -= CollectionChanged;
+				if(_groupSource is INotifyCollectionChanged notifyCollectionChanged)
+				{
+					notifyCollectionChanged.CollectionChanged -= CollectionChanged;
+				}
 			}
 		}
 
@@ -158,7 +205,10 @@ namespace Xamarin.Forms.Platform.Android
 
 			for (int n = 0; n < _groupSource.Count; n++)
 			{
-				_groups.Add(ItemsSourceFactory.Create(_groupSource[n] as IEnumerable, _adapter));
+				var source = ItemsSourceFactory.Create(_groupSource[n] as IEnumerable, _adapter);
+				source.HasFooter = _hasGroupFooters;
+				source.HasHeader = _hasGroupHeaders;
+				_groups.Add(source);
 			}
 		}
 

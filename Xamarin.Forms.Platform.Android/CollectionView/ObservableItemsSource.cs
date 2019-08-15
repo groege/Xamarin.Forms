@@ -30,17 +30,7 @@ namespace Xamarin.Forms.Platform.Android
 
 		public bool IsFooter(int index)
 		{
-			if (!HasFooter)
-			{
-				return false;
-			}
-
-			if (HasHeader)
-			{
-				return index == _itemsSource.Count + 1;
-			}
-
-			return index == _itemsSource.Count;
+			return HasFooter && index == Count - 1;
 		}
 
 		public bool IsHeader(int index)

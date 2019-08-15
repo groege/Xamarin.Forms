@@ -12,7 +12,13 @@ namespace Xamarin.Forms.Platform.Android
 		bool HasHeader { get; set; }
 		bool HasFooter { get; set; }
 
-		bool IsHeader(int index);
-		bool IsFooter(int index);
+		bool IsHeader(int position);
+		bool IsFooter(int position);
+	}
+
+	public interface IGroupedItemsViewSource : IItemsViewSource
+	{
+		bool IsGroupHeader(int position);
+		bool IsGroupFooter(int position);
 	}
 }

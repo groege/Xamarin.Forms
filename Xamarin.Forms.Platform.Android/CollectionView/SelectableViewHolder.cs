@@ -7,7 +7,7 @@ using Android.Util;
 
 namespace Xamarin.Forms.Platform.Android
 {
-	internal abstract class SelectableViewHolder : RecyclerView.ViewHolder, global::Android.Views.View.IOnClickListener
+	public abstract class SelectableViewHolder : RecyclerView.ViewHolder, global::Android.Views.View.IOnClickListener
 	{
 		bool _isSelected;
 		Drawable _selectedDrawable;

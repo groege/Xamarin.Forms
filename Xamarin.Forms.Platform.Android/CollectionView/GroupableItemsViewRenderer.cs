@@ -4,11 +4,11 @@ using Android.Content;
 
 namespace Xamarin.Forms.Platform.Android
 {
-	public class GroupableItemsViewRenderer : SelectableItemsViewRenderer
+	public class GroupableItemsViewRenderer<TItemsView, TAdapter, TItemsViewSource> : SelectableItemsViewRenderer<TItemsView, TAdapter, TItemsViewSource>
+		where TItemsView : GroupableItemsView
+		where TAdapter : GroupableItemsViewAdapter<TItemsView, TItemsViewSource>
+		where TItemsViewSource : IGroupedItemsViewSource
 	{
-		GroupableItemsView GroupableItemsView => (GroupableItemsView)ItemsView;
-		GroupableItemsViewAdapter GroupableItemsViewAdapter => (GroupableItemsViewAdapter)ItemsViewAdapter;
-
 		public GroupableItemsViewRenderer(Context context) : base(context)
 		{
 		}
@@ -17,25 +17,16 @@ namespace Xamarin.Forms.Platform.Android
 		{
 			base.OnElementPropertyChanged(sender, changedProperty);
 
-			if (changedProperty.Is(GroupableItemsView.IsGroupedProperty))
+			if (changedProperty.IsOneOf(GroupableItemsView.IsGroupedProperty, 
+				GroupableItemsView.GroupFooterTemplateProperty, GroupableItemsView.GroupHeaderTemplateProperty))
 			{
 				UpdateItemsSource();
 			}
 		}
 
-		protected override ItemsViewAdapter CreateAdapter()
+		protected override TAdapter CreateAdapter()
 		{
-			return new GroupableItemsViewAdapter(GroupableItemsView);
-		}
-
-		protected override void SetUpNewElement(ItemsView newElement)
-		{
-			if (newElement != null && !(newElement is GroupableItemsView))
-			{
-				throw new ArgumentException($"{nameof(newElement)} must be of type {typeof(GroupableItemsView).Name}");
-			}
-
-			base.SetUpNewElement(newElement);
+			return (TAdapter)new GroupableItemsViewAdapter<TItemsView, TItemsViewSource>(ItemsView);
 		}
 	}
 }
