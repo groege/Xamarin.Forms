@@ -17,14 +17,13 @@ namespace Xamarin.Forms.Platform.Android
 {
 	internal class ObservableGroupedSource : IGroupedItemsViewSource
 	{
-		readonly IList _groupSource;
 		readonly RecyclerView.Adapter _adapter;
+		readonly IList _groupSource;
 		List<IItemsViewSource> _groups = new List<IItemsViewSource>();
+		bool _disposed;
 
 		bool _hasGroupHeaders;
 		bool _hasGroupFooters;
-
-		bool _disposed;
 
 		public ObservableGroupedSource(GroupableItemsView groupableItemsView, RecyclerView.Adapter adapter)
 		{
@@ -138,19 +137,24 @@ namespace Xamarin.Forms.Platform.Android
 
 		public int GetPosition(object item)
 		{
-			for (int group = 0; group < _groupSource.Count; group++)
+			int previousGroupsOffset = 0;
+
+			for (int groupIndex = 0; groupIndex < _groupSource.Count; groupIndex++)
 			{
-				if (_groupSource[group] == item)
+				if (_groupSource[groupIndex] == item)
 				{
-					return AdjustPositionIndex(group);
+					return AdjustPositionIndex(groupIndex);
 				}
 
-				var inGroup = _groups[group].GetPosition(item);
+				var group = _groups[groupIndex];
+				var inGroup = group.GetPosition(item);
 
 				if (inGroup > -1)
 				{
-					return AdjustPositionIndex(group + inGroup);
+					return AdjustPositionIndex(previousGroupsOffset + inGroup);
 				}
+
+				previousGroupsOffset += group.Count;
 			}
 
 			return -1;

@@ -65,7 +65,7 @@ namespace Xamarin.Forms.Platform.Android
 				}
 			}
 
-			throw new IndexOutOfRangeException($"{item} not found in source.");
+			return -1;
 		}
 
 		public object GetItem(int position)
